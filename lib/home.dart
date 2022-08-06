@@ -45,6 +45,7 @@ class _HomeState extends State<Home> {
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
+        backgroundColor: Colors.lightBlueAccent,
         appBar: AppBar(
           title: const Text('Fetch Data Example'),
         ),
@@ -61,29 +62,29 @@ class _HomeState extends State<Home> {
           ),
         ), */
 
-        body: Container(
-          child: Card(
-              child: FutureBuilder(
-            future: getUserData(),
-            builder: (context, AsyncSnapshot snapshot) {
-              if (snapshot.data == null) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else {
-                return ListView.builder(
-                  itemCount: snapshot.data.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
+        body: FutureBuilder(
+          future: getUserData(),
+          builder: (context, AsyncSnapshot snapshot) {
+            if (snapshot.data == null) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              return ListView.builder(
+                itemCount: snapshot.data.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    elevation: 10,
+                    child: ListTile(
                       title: Text(snapshot.data[index].name),
                       subtitle: Text(snapshot.data[index].userName),
                       trailing: Text(snapshot.data[index].email),
-                    );
-                  },
-                );
-              }
-            },
-          )),
+                    ),
+                  );
+                },
+              );
+            }
+          },
         ),
       ),
     );
