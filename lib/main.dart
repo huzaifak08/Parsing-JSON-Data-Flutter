@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:playing_with_json/another.dart';
 import 'package:playing_with_json/home.dart';
 
 void main() {
@@ -17,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const Another(),
+      home: const Home(),
     );
   }
 }

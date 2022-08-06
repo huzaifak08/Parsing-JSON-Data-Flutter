@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'dart:async' show Future;
-
-import 'user_class.dart';
+import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -13,54 +12,86 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  var data = [];
+  // Must import the upper two 'Future' and 'http' Libraries:
+  // Using HTTP Request:
 
-  Future<String> loadJsonData() async {
-    var jsonText = await rootBundle.loadString('load_json/person.json');
-    setState(() {
-      data = json.decode(jsonText);
-    });
+  Future getUserData() async {
+    // If the link is not Secured then you can directly use => http.get('url')
 
-    return 'Sucess';
+    var response =
+        await http.get(Uri.http('jsonplaceholder.typicode.com', 'users'));
+
+    var jsonData = jsonDecode(response.body);
+
+    List<User> users = [];
+
+    for (var u in jsonData) {
+      User data1 =
+          User(name: u['name'], email: u['email'], userName: u['username']);
+
+      users.add(data1);
+    }
+
+    // For checking Purpose:
+    print('The Lenth Of Data is ${users.length}');
+    return users;
   }
 
-  @override
-  void initState() {
-    super.initState();
-    this.loadJsonData();
-  }
-
-  // List<User> users = getUsers();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Passing JSON data'),
+    return MaterialApp(
+      title: 'Fetch Data Example',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
       ),
-      body: Container(
-        // -------------------------------------------
-        // Parsing JSON Data from Asset File.
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Fetch Data Example'),
+        ),
 
-        child: ListView.builder(
-            itemCount: data == null ? 0 : data.length,
-            itemBuilder: ((context, index) {
-              var name = data[index]['name'];
-              var email = data[index]['email'];
-              return Column(
-                children: [
-                  ListTile(
-                    leading: CircleAvatar(child: Text("HK")),
-                    title: Text(name),
-                    subtitle: Text(email),
-                    trailing: Icon(
-                      Icons.verified_outlined,
-                      color: Colors.green,
-                    ),
-                  )
-                ],
-              );
-            })),
+/*      --------------------------------------
+        To Check If Everything is Working:
+
+        body: Center(
+          child: ElevatedButton(
+            child: Text('Click me'),
+            onPressed: () {
+              getUserData();
+            },
+          ),
+        ), */
+
+        body: Container(
+          child: Card(
+              child: FutureBuilder(
+            future: getUserData(),
+            builder: (context, AsyncSnapshot snapshot) {
+              if (snapshot.data == null) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else {
+                return ListView.builder(
+                  itemCount: snapshot.data.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(snapshot.data[index].name),
+                      subtitle: Text(snapshot.data[index].userName),
+                      trailing: Text(snapshot.data[index].email),
+                    );
+                  },
+                );
+              }
+            },
+          )),
+        ),
       ),
     );
   }
+}
+
+class User {
+  final String name, email, userName;
+
+  User({required this.name, required this.email, required this.userName});
 }
